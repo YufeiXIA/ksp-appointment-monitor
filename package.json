@@ -1,0 +1,14 @@
+{
+  "name": "ksp-written-test-helper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser-assisted monitor and form filler for KSP written permit test appointments.",
+  "main": "src/ksp-appointment-helper.js",
+  "scripts": {
+    "test": "node test/appointment-utils.test.js",
+    "start": "node src/ksp-appointment-helper.js"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}

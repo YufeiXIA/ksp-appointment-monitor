@@ -1,0 +1,9 @@
+node_modules/
+.env
+screenshots/*.png
+output/
+tmp/
+pet-candidates/
+pet-runs/
+.superpowers/
+docs/superpowers/
