@@ -2,14 +2,6 @@ const DEFAULT_URL = 'https://telegov.egov.com/KSP/AppointmentWizard';
 const DEFAULT_APPOINTMENT_TYPE = 'Driver License, CDL or Motorcycle Written (Permit) Test';
 const DEFAULT_LOCATION = 'Louisville (Bowman) Regional Test Site-Written Test';
 
-const REQUIRED_APPLICANT_FIELDS = [
-  'FIRST_NAME',
-  'LAST_NAME',
-  'DATE_OF_BIRTH',
-  'PHONE',
-  'EMAIL',
-];
-
 const GENERIC_MATCH_TOKENS = new Set([
   'and',
   'for',
@@ -58,7 +50,6 @@ function textScore(candidate, target) {
   }
 
   const matches = targetTokens.filter((token) => candidateTokens.has(token)).length;
-
   return matches / targetTokens.length;
 }
 
@@ -75,23 +66,6 @@ function bestTextMatch(options, target) {
   }
 
   return bestScore >= 0.6 ? best : null;
-}
-
-function isLikelySlotText(value) {
-  const text = String(value || '').trim();
-  const normalized = normalizeText(text);
-
-  if (!text || /^(continue|next|back|cancel|home|help)$/i.test(text)) return false;
-  if (/back|cancel|administrator/.test(normalized)) return false;
-
-  return /\b\d{1,2}:\d{2}\s*(AM|PM)?\b/i.test(text)
-    || /\b(AM|PM)\b/i.test(text)
-    || /\bavailable\b/i.test(text);
-}
-
-function isInPersonAppointmentActionText(value) {
-  const normalized = normalizeText(value);
-  return normalized === 'select in person appointment';
 }
 
 function getLocationAvailabilityStatus(bodyText, target) {
@@ -113,7 +87,7 @@ function getLocationAvailabilityStatus(bodyText, target) {
 
   const targetWindow = lines.slice(targetIndex, targetIndex + 10).join('\n');
   if (/no availability/i.test(targetWindow)) return 'unavailable';
-  if (/check earliest availability|select in person appointment/i.test(targetWindow)) return 'available';
+  if (/select in person appointment|check earliest availability|\b\d+\s+available\b/i.test(targetWindow)) return 'available';
 
   return 'missing';
 }
@@ -147,41 +121,19 @@ function envToConfig(env) {
     url: env.KSP_URL || DEFAULT_URL,
     appointmentTypeText: env.APPOINTMENT_TYPE_TEXT || DEFAULT_APPOINTMENT_TYPE,
     locationText: env.LOCATION_TEXT || DEFAULT_LOCATION,
-    preferredDate: env.PREFERRED_DATE || '',
     pollSeconds: Math.max(60, numberFromEnv(env.POLL_SECONDS, 60)),
     headless: boolFromEnv(env.HEADLESS, false),
     slowMoMs: numberFromEnv(env.SLOW_MO_MS, 75),
-    applicant: {
-      FIRST_NAME: env.FIRST_NAME || '',
-      MIDDLE_NAME: env.MIDDLE_NAME || '',
-      LAST_NAME: env.LAST_NAME || '',
-      DATE_OF_BIRTH: env.DATE_OF_BIRTH || '',
-      PHONE: env.PHONE || '',
-      EMAIL: env.EMAIL || '',
-      ADDRESS: env.ADDRESS || '',
-      CITY: env.CITY || '',
-      STATE: env.STATE || 'KY',
-      ZIP: env.ZIP || '',
-      LICENSE_OR_PERMIT_NUMBER: env.LICENSE_OR_PERMIT_NUMBER || '',
-    },
   };
-}
-
-function validateRequiredConfig(config) {
-  return REQUIRED_APPLICANT_FIELDS.filter((field) => !config.applicant[field]);
 }
 
 module.exports = {
   DEFAULT_APPOINTMENT_TYPE,
   DEFAULT_LOCATION,
   DEFAULT_URL,
-  REQUIRED_APPLICANT_FIELDS,
   bestTextMatch,
   buildWindowsPopupCommand,
   envToConfig,
   getLocationAvailabilityStatus,
-  isInPersonAppointmentActionText,
-  isLikelySlotText,
   normalizeText,
-  validateRequiredConfig,
 };

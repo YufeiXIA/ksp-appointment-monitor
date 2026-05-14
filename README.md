@@ -1,30 +1,29 @@
-# KSP Written Permit Test Helper
+# KSP Appointment Monitor
 
-This is a browser-assisted monitor for the Kentucky State Police appointment site.
-It targets:
+Browser-assisted availability monitor for Kentucky State Police written permit test appointments.
 
-- Appointment type: `Driver License, CDL or Motorcycle Written (Permit) Test`
-- Location: `Louisville (Bowman) Regional Test Site-Written Test`
+## Current Status
 
-It opens a real Chromium browser, checks the target Louisville/Bowman location card at a respectful interval, and alerts you when that card shows a `Select In Person Appointment` option. It saves a screenshot and leaves the browser open for your manual review.
+- Watches `Driver License, CDL or Motorcycle Written (Permit) Test`.
+- Targets `Louisville (Bowman) Regional Test Site-Written Test`.
+- Checks every 60 seconds by default.
+- Alerts when the target location card shows `Select In Person Appointment`, `Check Earliest Availability`, or an available-count line such as `May 05, 1 available.`
+- Plays a terminal bell, opens a Windows popup, saves a screenshot, and stops with the browser open.
+- Does not click into the booking flow after alerting.
+- Does not fill applicant information.
+- Does not submit or confirm appointments.
 
 ## Setup
 
 ```powershell
-cd "C:\Users\xyf_a\Documents\New project"
+git clone https://github.com/YufeiXIA/ksp-appointment-monitor.git
+cd ksp-appointment-monitor
 npm install
 npx playwright install chromium
 Copy-Item .env.example .env
-notepad .env
 ```
 
-Fill the required values in `.env`:
-
-- `FIRST_NAME`
-- `LAST_NAME`
-- `DATE_OF_BIRTH`
-- `PHONE`
-- `EMAIL`
+The `.env` file is optional. Use it only if you want to change the target location, polling interval, or browser behavior.
 
 ## Run
 
@@ -32,11 +31,38 @@ Fill the required values in `.env`:
 npm start
 ```
 
-The script enforces a minimum `POLL_SECONDS` value of 60 seconds.
+The monitor enforces a minimum `POLL_SECONDS` value of 60 seconds.
 
-## Notes
+## Configuration
 
-- The script does not bypass CAPTCHA, rate limits, eligibility rules, or final confirmation steps.
-- The script does not click into the booking flow after it alerts.
-- The script does not fill applicant information.
-- The script does not click the final submit/confirm button.
+`.env.example` contains the supported settings:
+
+```env
+APPOINTMENT_TYPE_TEXT=Driver License, CDL or Motorcycle Written (Permit) Test
+LOCATION_TEXT=Louisville (Bowman) Regional Test Site-Written Test
+POLL_SECONDS=60
+HEADLESS=false
+SLOW_MO_MS=75
+```
+
+No personal information is required.
+
+## Test
+
+```powershell
+npm test
+node --check src\appointment-utils.js
+node --check src\ksp-appointment-helper.js
+```
+
+## Safety Notes
+
+- The monitor does not bypass CAPTCHA, rate limits, eligibility rules, or confirmation steps.
+- It only watches the target location card and alerts when an appointment entry point appears.
+- Screenshots are saved locally under `screenshots/` and are ignored by Git.
+- `.env` is ignored by Git.
+
+## Contributors
+
+- YufeiXIA
+- Codex

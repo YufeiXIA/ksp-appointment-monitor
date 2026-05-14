@@ -1,14 +1,11 @@
 const assert = require('node:assert/strict');
 
 const {
+  bestTextMatch,
+  buildWindowsPopupCommand,
   envToConfig,
   getLocationAvailabilityStatus,
-  isLikelySlotText,
-  isInPersonAppointmentActionText,
-  buildWindowsPopupCommand,
   normalizeText,
-  bestTextMatch,
-  validateRequiredConfig,
 } = require('../src/appointment-utils');
 
 function runTest(name, fn) {
@@ -122,13 +119,7 @@ runTest('getLocationAvailabilityStatus detects available date text on target car
 });
 
 runTest('envToConfig applies safe defaults for monitoring', () => {
-  const config = envToConfig({
-    FIRST_NAME: 'Ada',
-    LAST_NAME: 'Lovelace',
-    DATE_OF_BIRTH: '01/02/2000',
-    PHONE: '5025551234',
-    EMAIL: 'ada@example.com',
-  });
+  const config = envToConfig({});
 
   assert.equal(config.url, 'https://telegov.egov.com/KSP/AppointmentWizard');
   assert.equal(config.appointmentTypeText, 'Driver License, CDL or Motorcycle Written (Permit) Test');
@@ -137,33 +128,9 @@ runTest('envToConfig applies safe defaults for monitoring', () => {
   assert.equal(config.headless, false);
 });
 
-runTest('validateRequiredConfig reports missing applicant fields', () => {
-  const missing = validateRequiredConfig(envToConfig({ FIRST_NAME: 'Ada' }));
-
-  assert.deepEqual(missing, [
-    'LAST_NAME',
-    'DATE_OF_BIRTH',
-    'PHONE',
-    'EMAIL',
-  ]);
-});
-
-runTest('isLikelySlotText accepts appointment-looking time text', () => {
-  assert.equal(isLikelySlotText('9:40 AM'), true);
-  assert.equal(isLikelySlotText('Available 2:15 PM'), true);
-});
-
-runTest('isLikelySlotText rejects navigation controls', () => {
-  assert.equal(isLikelySlotText('Continue'), false);
-  assert.equal(isLikelySlotText('Next'), false);
-  assert.equal(isLikelySlotText('Back'), false);
-  assert.equal(isLikelySlotText('Check Earliest Availability'), false);
-});
-
-runTest('isInPersonAppointmentActionText detects modal appointment button', () => {
-  assert.equal(isInPersonAppointmentActionText('Select In Person Appointment'), true);
-  assert.equal(isInPersonAppointmentActionText('for Louisville(Bowman) Regional Test Site-Written Test'), false);
-  assert.equal(isInPersonAppointmentActionText('Check Earliest Availability'), false);
+runTest('envToConfig enforces a 60-second minimum poll interval', () => {
+  const config = envToConfig({ POLL_SECONDS: '5' });
+  assert.equal(config.pollSeconds, 60);
 });
 
 runTest('buildWindowsPopupCommand escapes single quotes for PowerShell', () => {
