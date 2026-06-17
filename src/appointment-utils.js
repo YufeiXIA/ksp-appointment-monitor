@@ -1,6 +1,19 @@
 const DEFAULT_URL = 'https://telegov.egov.com/KSP/AppointmentWizard';
-const DEFAULT_APPOINTMENT_TYPE = 'Driver License, CDL or Motorcycle Written (Permit) Test';
-const DEFAULT_LOCATION = 'Louisville (Bowman) Regional Test Site-Written Test';
+const APPOINTMENT_PROFILES = {
+  written: {
+    key: 'written',
+    label: 'Written permit test',
+    appointmentTypeText: 'Driver License, CDL or Motorcycle Written (Permit) Test',
+    locationText: 'Louisville (Bowman) Regional Test Site-Written Test',
+  },
+  road: {
+    key: 'road',
+    label: 'Road test',
+    appointmentTypeText: 'Driver License Road Test Appointments',
+    locationText: 'Louisville(Bowman) Regional Test Site - Road Test',
+  },
+};
+const DEFAULT_PROFILE_KEY = 'written';
 
 const GENERIC_MATCH_TOKENS = new Set([
   'and',
@@ -106,6 +119,14 @@ function buildWindowsPopupCommand(message, title = 'KSP Appointment Alert') {
   ].join(' ');
 }
 
+function appointmentProfileKeys() {
+  return Object.keys(APPOINTMENT_PROFILES);
+}
+
+function getAppointmentProfile(profileKey = DEFAULT_PROFILE_KEY) {
+  return APPOINTMENT_PROFILES[profileKey] || APPOINTMENT_PROFILES[DEFAULT_PROFILE_KEY];
+}
+
 function boolFromEnv(value, fallback = false) {
   if (value === undefined || value === null || value === '') return fallback;
   return ['1', 'true', 'yes', 'y', 'on'].includes(String(value).trim().toLowerCase());
@@ -116,11 +137,15 @@ function numberFromEnv(value, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function envToConfig(env) {
+function envToConfig(env, profileKey = DEFAULT_PROFILE_KEY) {
+  const profile = getAppointmentProfile(profileKey);
+
   return {
+    profileKey: profile.key,
+    profileLabel: profile.label,
     url: env.KSP_URL || DEFAULT_URL,
-    appointmentTypeText: env.APPOINTMENT_TYPE_TEXT || DEFAULT_APPOINTMENT_TYPE,
-    locationText: env.LOCATION_TEXT || DEFAULT_LOCATION,
+    appointmentTypeText: profile.appointmentTypeText,
+    locationText: profile.locationText,
     pollSeconds: Math.max(30, numberFromEnv(env.POLL_SECONDS, 30)),
     headless: boolFromEnv(env.HEADLESS, false),
     slowMoMs: numberFromEnv(env.SLOW_MO_MS, 75),
@@ -128,12 +153,14 @@ function envToConfig(env) {
 }
 
 module.exports = {
-  DEFAULT_APPOINTMENT_TYPE,
-  DEFAULT_LOCATION,
+  APPOINTMENT_PROFILES,
+  DEFAULT_PROFILE_KEY,
   DEFAULT_URL,
+  appointmentProfileKeys,
   bestTextMatch,
   buildWindowsPopupCommand,
   envToConfig,
+  getAppointmentProfile,
   getLocationAvailabilityStatus,
   normalizeText,
 };

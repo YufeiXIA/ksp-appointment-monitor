@@ -1,9 +1,11 @@
 const assert = require('node:assert/strict');
 
 const {
+  APPOINTMENT_PROFILES,
   bestTextMatch,
   buildWindowsPopupCommand,
   envToConfig,
+  getAppointmentProfile,
   getLocationAvailabilityStatus,
   normalizeText,
 } = require('../src/appointment-utils');
@@ -124,8 +126,22 @@ runTest('envToConfig applies safe defaults for monitoring', () => {
   assert.equal(config.url, 'https://telegov.egov.com/KSP/AppointmentWizard');
   assert.equal(config.appointmentTypeText, 'Driver License, CDL or Motorcycle Written (Permit) Test');
   assert.equal(config.locationText, 'Louisville (Bowman) Regional Test Site-Written Test');
+  assert.equal(config.profileKey, 'written');
   assert.equal(config.pollSeconds, 30);
   assert.equal(config.headless, false);
+});
+
+runTest('envToConfig applies road test profile', () => {
+  const config = envToConfig({}, 'road');
+
+  assert.equal(config.appointmentTypeText, 'Driver License Road Test Appointments');
+  assert.equal(config.locationText, 'Louisville(Bowman) Regional Test Site - Road Test');
+  assert.equal(config.profileKey, 'road');
+});
+
+runTest('getAppointmentProfile falls back to written profile', () => {
+  assert.equal(getAppointmentProfile('missing').key, 'written');
+  assert.deepEqual(Object.keys(APPOINTMENT_PROFILES), ['written', 'road']);
 });
 
 runTest('envToConfig enforces a 30-second minimum poll interval', () => {

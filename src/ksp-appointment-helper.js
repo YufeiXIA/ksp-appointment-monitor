@@ -1,11 +1,14 @@
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const readline = require('node:readline/promises');
 const { chromium } = require('playwright');
 const {
+  appointmentProfileKeys,
   bestTextMatch,
   buildWindowsPopupCommand,
   envToConfig,
+  getAppointmentProfile,
   getLocationAvailabilityStatus,
 } = require('./appointment-utils');
 
@@ -39,6 +42,38 @@ function log(message) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function chooseAppointmentProfile(env) {
+  const profileKeys = appointmentProfileKeys();
+  const requestedProfile = String(env.APPOINTMENT_PROFILE || '').trim().toLowerCase();
+
+  if (profileKeys.includes(requestedProfile)) {
+    return requestedProfile;
+  }
+
+  if (!process.stdin.isTTY) {
+    return 'written';
+  }
+
+  console.log('Choose appointment type to monitor:');
+  profileKeys.forEach((key, index) => {
+    const profile = getAppointmentProfile(key);
+    console.log(`  ${index + 1}) ${profile.label} - ${profile.locationText}`);
+  });
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  try {
+    const answer = await rl.question('Select 1 or 2 [1]: ');
+    const selectedIndex = Number.parseInt(answer.trim() || '1', 10) - 1;
+    return profileKeys[selectedIndex] || 'written';
+  } finally {
+    rl.close();
+  }
 }
 
 function showWindowsPopup(message) {
@@ -121,8 +156,10 @@ async function checkOnce(page, config) {
 
 async function main() {
   const env = { ...process.env, ...loadDotEnv(path.join(ROOT, '.env')) };
-  const config = envToConfig(env);
+  const profileKey = await chooseAppointmentProfile(env);
+  const config = envToConfig(env, profileKey);
 
+  log(`Selected profile: ${config.profileLabel}`);
   log(`Target type: ${config.appointmentTypeText}`);
   log(`Target location: ${config.locationText}`);
   log(`Polling every ${config.pollSeconds} seconds. The script only watches for the target location's Select In Person Appointment option.`);

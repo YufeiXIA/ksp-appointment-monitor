@@ -1,18 +1,19 @@
 # KSP Appointment Monitor
 
-A small Playwright-based monitor for Kentucky State Police written permit test appointment availability.
+A small Playwright-based monitor for Kentucky State Police appointment availability.
 
-By default it watches:
+It supports two Louisville/Bowman profiles:
 
-- Appointment type: `Driver License, CDL or Motorcycle Written (Permit) Test`
-- Location: `Louisville (Bowman) Regional Test Site-Written Test`
+- `written`: written permit test
+- `road`: driver license road test
 
 When the target location card shows an appointment entry point, the monitor plays a bell, opens a Windows popup, and stops with the browser open so you can review the page yourself.
 
 ## What It Does
 
 - Checks the KSP appointment site every 30 seconds by default.
-- Looks only at the configured target location card.
+- Prompts you to choose written test or road test when the script starts.
+- Looks only at the selected target location card.
 - Alerts when that card shows `Select In Person Appointment`, `Check Earliest Availability`, or an available-count line such as `May 05, 1 available.`
 - Leaves the browser open after an alert.
 
@@ -50,8 +51,7 @@ The `.env` file is optional. Copying it gives you an easy place to change the ta
 Edit `.env` if you want to change the defaults:
 
 ```env
-APPOINTMENT_TYPE_TEXT=Driver License, CDL or Motorcycle Written (Permit) Test
-LOCATION_TEXT=Louisville (Bowman) Regional Test Site-Written Test
+APPOINTMENT_PROFILE=
 POLL_SECONDS=30
 HEADLESS=false
 SLOW_MO_MS=75
@@ -59,8 +59,7 @@ SLOW_MO_MS=75
 
 | Setting | Purpose |
 | --- | --- |
-| `APPOINTMENT_TYPE_TEXT` | The appointment type text to click on the KSP start page. |
-| `LOCATION_TEXT` | The exact target location card to watch. |
+| `APPOINTMENT_PROFILE` | Optional. Use `written` or `road` to skip the startup prompt. Leave blank to choose interactively. |
 | `POLL_SECONDS` | How often to check. Values below 30 are raised to 30. |
 | `HEADLESS` | Use `true` to run without a visible browser. |
 | `SLOW_MO_MS` | Small delay between browser actions, useful for visibility and stability. |
@@ -73,6 +72,15 @@ From the project folder:
 
 ```powershell
 npm start
+```
+
+You will see:
+
+```text
+Choose appointment type to monitor:
+  1) Written permit test - Louisville (Bowman) Regional Test Site-Written Test
+  2) Road test - Louisville(Bowman) Regional Test Site - Road Test
+Select 1 or 2 [1]:
 ```
 
 While there is no availability, logs look like this:
