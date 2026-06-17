@@ -11,7 +11,7 @@ When the target location card shows an appointment entry point, the monitor play
 
 ## What It Does
 
-- Checks the KSP appointment site every 60 seconds by default.
+- Checks the KSP appointment site every 30 seconds by default.
 - Looks only at the configured target location card.
 - Alerts when that card shows `Select In Person Appointment`, `Check Earliest Availability`, or an available-count line such as `May 05, 1 available.`
 - Leaves the browser open after an alert.
@@ -52,7 +52,7 @@ Edit `.env` if you want to change the defaults:
 ```env
 APPOINTMENT_TYPE_TEXT=Driver License, CDL or Motorcycle Written (Permit) Test
 LOCATION_TEXT=Louisville (Bowman) Regional Test Site-Written Test
-POLL_SECONDS=60
+POLL_SECONDS=30
 HEADLESS=false
 SLOW_MO_MS=75
 ```
@@ -61,7 +61,7 @@ SLOW_MO_MS=75
 | --- | --- |
 | `APPOINTMENT_TYPE_TEXT` | The appointment type text to click on the KSP start page. |
 | `LOCATION_TEXT` | The exact target location card to watch. |
-| `POLL_SECONDS` | How often to check. Values below 60 are raised to 60. |
+| `POLL_SECONDS` | How often to check. Values below 30 are raised to 30. |
 | `HEADLESS` | Use `true` to run without a visible browser. |
 | `SLOW_MO_MS` | Small delay between browser actions, useful for visibility and stability. |
 

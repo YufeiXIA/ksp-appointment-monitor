@@ -124,13 +124,13 @@ runTest('envToConfig applies safe defaults for monitoring', () => {
   assert.equal(config.url, 'https://telegov.egov.com/KSP/AppointmentWizard');
   assert.equal(config.appointmentTypeText, 'Driver License, CDL or Motorcycle Written (Permit) Test');
   assert.equal(config.locationText, 'Louisville (Bowman) Regional Test Site-Written Test');
-  assert.equal(config.pollSeconds, 60);
+  assert.equal(config.pollSeconds, 30);
   assert.equal(config.headless, false);
 });
 
-runTest('envToConfig enforces a 60-second minimum poll interval', () => {
+runTest('envToConfig enforces a 30-second minimum poll interval', () => {
   const config = envToConfig({ POLL_SECONDS: '5' });
-  assert.equal(config.pollSeconds, 60);
+  assert.equal(config.pollSeconds, 30);
 });
 
 runTest('buildWindowsPopupCommand escapes single quotes for PowerShell', () => {

@@ -121,7 +121,7 @@ function envToConfig(env) {
     url: env.KSP_URL || DEFAULT_URL,
     appointmentTypeText: env.APPOINTMENT_TYPE_TEXT || DEFAULT_APPOINTMENT_TYPE,
     locationText: env.LOCATION_TEXT || DEFAULT_LOCATION,
-    pollSeconds: Math.max(60, numberFromEnv(env.POLL_SECONDS, 60)),
+    pollSeconds: Math.max(30, numberFromEnv(env.POLL_SECONDS, 30)),
     headless: boolFromEnv(env.HEADLESS, false),
     slowMoMs: numberFromEnv(env.SLOW_MO_MS, 75),
   };
