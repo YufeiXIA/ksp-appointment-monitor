@@ -10,7 +10,6 @@ const {
 } = require('./appointment-utils');
 
 const ROOT = path.resolve(__dirname, '..');
-const SCREENSHOT_DIR = path.join(ROOT, 'screenshots');
 
 function loadDotEnv(filePath) {
   if (!fs.existsSync(filePath)) return {};
@@ -67,14 +66,6 @@ function alertUser(message) {
   showWindowsPopup(message);
 }
 
-async function screenshot(page, label) {
-  fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
-  const safeLabel = label.replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
-  const filePath = path.join(SCREENSHOT_DIR, `${Date.now()}-${safeLabel}.png`);
-  await page.screenshot({ path: filePath, fullPage: true });
-  log(`Screenshot saved: ${filePath}`);
-}
-
 async function visibleTexts(locator) {
   const count = await locator.count();
   const texts = [];
@@ -116,18 +107,15 @@ async function checkOnce(page, config) {
 
   if (locationStatus === 'available') {
     alertUser(`${config.locationText} has Select In Person Appointment available. Please review the browser now.`);
-    await screenshot(page, 'target-location-available');
     return true;
   }
 
   if (locationStatus === 'unavailable') {
     log(`Target location is listed, but currently shows No Availability: ${config.locationText}`);
-    await screenshot(page, 'target-location-no-availability');
     return false;
   }
 
   log(`Target location was not found on this check: ${config.locationText}`);
-  await screenshot(page, 'target-location-missing');
   return false;
 }
 
@@ -157,7 +145,6 @@ async function main() {
       await sleep(config.pollSeconds * 1000);
     }
   } catch (error) {
-    await screenshot(page, 'error');
     console.error(error);
     process.exitCode = 1;
   }

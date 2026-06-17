@@ -7,14 +7,13 @@ By default it watches:
 - Appointment type: `Driver License, CDL or Motorcycle Written (Permit) Test`
 - Location: `Louisville (Bowman) Regional Test Site-Written Test`
 
-When the target location card shows an appointment entry point, the monitor plays a bell, opens a Windows popup, saves a screenshot, and stops with the browser open so you can review the page yourself.
+When the target location card shows an appointment entry point, the monitor plays a bell, opens a Windows popup, and stops with the browser open so you can review the page yourself.
 
 ## What It Does
 
 - Checks the KSP appointment site every 60 seconds by default.
 - Looks only at the configured target location card.
 - Alerts when that card shows `Select In Person Appointment`, `Check Earliest Availability`, or an available-count line such as `May 05, 1 available.`
-- Saves screenshots under `screenshots/`.
 - Leaves the browser open after an alert.
 
 ## What It Does Not Do
@@ -31,7 +30,7 @@ When the target location card shows an appointment entry point, the monitor play
 - Git
 - Windows PowerShell for the popup alert
 
-The monitor itself can run anywhere Playwright Chromium runs, but the popup helper is Windows-specific. On other platforms, the terminal bell and screenshot still work.
+The monitor itself can run anywhere Playwright Chromium runs, but the popup helper is Windows-specific. On other platforms, the terminal bell still works.
 
 ## Quick Start
 
@@ -80,15 +79,13 @@ While there is no availability, logs look like this:
 
 ```text
 Target location is listed, but currently shows No Availability: Louisville (Bowman) Regional Test Site-Written Test
-Screenshot saved: ...\screenshots\...\target-location-no-availability.png
 ```
 
 When availability appears, the monitor:
 
 1. Plays the terminal bell.
 2. Shows a Windows popup.
-3. Saves a screenshot named like `target-location-available`.
-4. Stops polling with the browser open.
+3. Stops polling with the browser open.
 
 At that point, review the page and continue manually.
 
@@ -110,7 +107,6 @@ node --check src\ksp-appointment-helper.js
 ## Privacy
 
 - `.env` is ignored by Git.
-- `screenshots/` is ignored by Git.
 - `node_modules/` and local temporary output folders are ignored by Git.
 - The monitor does not collect or transmit personal information.
 
