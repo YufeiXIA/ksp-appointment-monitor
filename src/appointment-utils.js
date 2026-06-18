@@ -137,6 +137,10 @@ function numberFromEnv(value, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function normalizePollSeconds(value, fallback = 30) {
+  return Math.max(30, numberFromEnv(value, fallback));
+}
+
 function envToConfig(env, profileKey = DEFAULT_PROFILE_KEY) {
   const profile = getAppointmentProfile(profileKey);
 
@@ -146,7 +150,7 @@ function envToConfig(env, profileKey = DEFAULT_PROFILE_KEY) {
     url: env.KSP_URL || DEFAULT_URL,
     appointmentTypeText: profile.appointmentTypeText,
     locationText: profile.locationText,
-    pollSeconds: Math.max(30, numberFromEnv(env.POLL_SECONDS, 30)),
+    pollSeconds: normalizePollSeconds(env.POLL_SECONDS),
     headless: boolFromEnv(env.HEADLESS, false),
     slowMoMs: numberFromEnv(env.SLOW_MO_MS, 75),
   };
@@ -162,5 +166,6 @@ module.exports = {
   envToConfig,
   getAppointmentProfile,
   getLocationAvailabilityStatus,
+  normalizePollSeconds,
   normalizeText,
 };

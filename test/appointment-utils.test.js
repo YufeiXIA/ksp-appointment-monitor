@@ -8,6 +8,7 @@ const {
   getAppointmentProfile,
   getLocationAvailabilityStatus,
   normalizeText,
+  normalizePollSeconds,
 } = require('../src/appointment-utils');
 
 function runTest(name, fn) {
@@ -147,6 +148,14 @@ runTest('getAppointmentProfile falls back to written profile', () => {
 runTest('envToConfig enforces a 30-second minimum poll interval', () => {
   const config = envToConfig({ POLL_SECONDS: '5' });
   assert.equal(config.pollSeconds, 30);
+});
+
+runTest('normalizePollSeconds accepts custom startup interval', () => {
+  assert.equal(normalizePollSeconds('45'), 45);
+});
+
+runTest('normalizePollSeconds raises low startup interval to minimum', () => {
+  assert.equal(normalizePollSeconds('5'), 30);
 });
 
 runTest('buildWindowsPopupCommand escapes single quotes for PowerShell', () => {

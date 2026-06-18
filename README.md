@@ -44,7 +44,7 @@ Copy-Item .env.example .env
 npm start
 ```
 
-The `.env` file is optional. Copying it gives you an easy place to change the target location, interval, or browser settings.
+The `.env` file is optional. Copying it gives you an easy place to change the default profile, interval, or browser settings.
 
 ## Configuration
 
@@ -60,7 +60,7 @@ SLOW_MO_MS=75
 | Setting | Purpose |
 | --- | --- |
 | `APPOINTMENT_PROFILE` | Optional. Use `written` or `road` to skip the startup prompt. Leave blank to choose interactively. |
-| `POLL_SECONDS` | How often to check. Values below 30 are raised to 30. |
+| `POLL_SECONDS` | Default refresh interval. Values below 30 are raised to 30. You can also choose this when the script starts. |
 | `HEADLESS` | Use `true` to run without a visible browser. |
 | `SLOW_MO_MS` | Small delay between browser actions, useful for visibility and stability. |
 
@@ -81,6 +81,7 @@ Choose appointment type to monitor:
   1) Written permit test - Louisville (Bowman) Regional Test Site-Written Test
   2) Road test - Louisville(Bowman) Regional Test Site - Road Test
 Select 1 or 2 [1]:
+Refresh interval in seconds, minimum 30 [30]:
 ```
 
 While there is no availability, logs look like this:

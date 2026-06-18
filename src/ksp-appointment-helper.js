@@ -10,6 +10,7 @@ const {
   envToConfig,
   getAppointmentProfile,
   getLocationAvailabilityStatus,
+  normalizePollSeconds,
 } = require('./appointment-utils');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -71,6 +72,26 @@ async function chooseAppointmentProfile(env) {
     const answer = await rl.question('Select 1 or 2 [1]: ');
     const selectedIndex = Number.parseInt(answer.trim() || '1', 10) - 1;
     return profileKeys[selectedIndex] || 'written';
+  } finally {
+    rl.close();
+  }
+}
+
+async function choosePollSeconds(env) {
+  const defaultPollSeconds = normalizePollSeconds(env.POLL_SECONDS);
+
+  if (!process.stdin.isTTY) {
+    return defaultPollSeconds;
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  try {
+    const answer = await rl.question(`Refresh interval in seconds, minimum 30 [${defaultPollSeconds}]: `);
+    return normalizePollSeconds(answer.trim() || String(defaultPollSeconds), defaultPollSeconds);
   } finally {
     rl.close();
   }
@@ -157,7 +178,8 @@ async function checkOnce(page, config) {
 async function main() {
   const env = { ...process.env, ...loadDotEnv(path.join(ROOT, '.env')) };
   const profileKey = await chooseAppointmentProfile(env);
-  const config = envToConfig(env, profileKey);
+  const pollSeconds = await choosePollSeconds(env);
+  const config = envToConfig({ ...env, POLL_SECONDS: String(pollSeconds) }, profileKey);
 
   log(`Selected profile: ${config.profileLabel}`);
   log(`Target type: ${config.appointmentTypeText}`);
