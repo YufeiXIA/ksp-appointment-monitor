@@ -1,5 +1,7 @@
 # KSP Appointment Monitor
 
+> English | [简体中文](README.zh-CN.md)
+
 A small Playwright-based monitor for Kentucky State Police appointment availability.
 
 It supports two Louisville/Bowman profiles:
